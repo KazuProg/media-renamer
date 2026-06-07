@@ -6,5 +6,20 @@
       "source.fixAll.ruff": "explicit",
       "source.organizeImports.ruff": "explicit"
     }
-  }
+  },
+  "python.defaultInterpreterPath": ".venv/bin/python",
+  "cSpell.words": [
+    "addopts",
+    "creationdate",
+    "exif",
+    "ffprobe",
+    "getexif",
+    "ivar",
+    "pycache",
+    "pytest",
+    "pythonpath",
+    "quicktime",
+    "testpaths",
+    "venv"
+  ]
 }
