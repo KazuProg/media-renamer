@@ -10,15 +10,17 @@ from media_info import get_media_info
 from utils import resolve_unique_path, split_stem_and_ext
 
 
-def rename_file(file_path: str) -> bool:
+def rename_file(file_path: str, *, dry_run: bool = False) -> bool:
     """Rename a single media file.
 
     :param file_path: Path to the file to rename.
+    :param dry_run: When ``True``, preview renames without modifying files.
     :return: ``True`` when processing finishes; ``False`` on exception.
     """
     try:
         dirpath, file = os.path.split(file_path)
-        os.chmod(file_path, 0o666)
+        if not dry_run:
+            os.chmod(file_path, 0o666)
         media_info = get_media_info(file_path)
         if media_info is None:
             print("NoMediaInfo")
@@ -33,16 +35,18 @@ def rename_file(file_path: str) -> bool:
             original_name,
         )
         print(file + " -> " + new_name)
-        shutil.move(file_path, new_path)
+        if not dry_run:
+            shutil.move(file_path, new_path)
         return True
     except Exception:
         return False
 
 
-def process_existing_files(path: str) -> int:
+def process_existing_files(path: str, *, dry_run: bool = False) -> int:
     """Process all unrenamed files under the given directory.
 
     :param path: Root directory to walk.
+    :param dry_run: When ``True``, preview renames without modifying files.
     :return: Number of files that failed to rename.
     """
     renamed = 0
@@ -55,9 +59,12 @@ def process_existing_files(path: str) -> int:
             if get_media_info(file_path) is None:
                 continue
             print(f"Processing: {file_path}")
-            if rename_file(file_path):
+            if rename_file(file_path, dry_run=dry_run):
                 renamed += 1
             else:
                 failed += 1
-    print(f"Done: {renamed} renamed, {failed} failed")
+    if dry_run:
+        print(f"Done (dry run): {renamed} would rename, {failed} failed")
+    else:
+        print(f"Done: {renamed} renamed, {failed} failed")
     return failed

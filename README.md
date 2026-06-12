@@ -48,9 +48,12 @@ uv run python src/main.py
 
 # ディレクトリを指定
 uv run python src/main.py /path/to/media
+
+# リネーム結果を事前確認（ファイルは変更しない）
+uv run python src/main.py --dry-run /path/to/media
 ```
 
-処理完了時に `Done: N renamed, M failed` が表示されます。失敗が 1 件以上ある場合、終了コードは `1` になります。
+処理完了時に `Done: N renamed, M failed` が表示されます。`--dry-run` 時は `Done (dry run): N would rename, M failed` です。失敗が 1 件以上ある場合、終了コードは `1` になります。
 
 ## 構成
 
