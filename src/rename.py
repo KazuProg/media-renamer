@@ -6,14 +6,20 @@ Embeds timestamp information into filenames and assigns unique names on collisio
 import os
 import shutil
 
-from media_info import get_media_info
+from media_info import MediaInfo, get_media_info
 from utils import resolve_unique_path, split_stem_and_ext
 
 
-def rename_file(file_path: str, *, dry_run: bool = False) -> bool:
+def rename_file(
+    file_path: str,
+    media_info: MediaInfo,
+    *,
+    dry_run: bool = False,
+) -> bool:
     """Rename a single media file.
 
     :param file_path: Path to the file to rename.
+    :param media_info: Metadata used to build the new filename.
     :param dry_run: When ``True``, preview renames without modifying files.
     :return: ``True`` when processing finishes; ``False`` on exception.
     """
@@ -21,10 +27,6 @@ def rename_file(file_path: str, *, dry_run: bool = False) -> bool:
         dirpath, file = os.path.split(file_path)
         if not dry_run:
             os.chmod(file_path, 0o666)
-        media_info = get_media_info(file_path)
-        if media_info is None:
-            print("NoMediaInfo")
-            return True
 
         stem, _ = split_stem_and_ext(file)
         original_name = f"{stem}.{media_info['ext']}"
@@ -56,10 +58,11 @@ def process_existing_files(path: str, *, dry_run: bool = False) -> int:
             file_path = os.path.join(root, filename)
             if not os.path.isfile(file_path):
                 continue
-            if get_media_info(file_path) is None:
+            media_info = get_media_info(file_path)
+            if media_info is None:
                 continue
             print(f"Processing: {file_path}")
-            if rename_file(file_path, dry_run=dry_run):
+            if rename_file(file_path, media_info, dry_run=dry_run):
                 renamed += 1
             else:
                 failed += 1
